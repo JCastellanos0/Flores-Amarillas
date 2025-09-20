@@ -1,0 +1,440 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Quicksand', sans-serif;
+  background: linear-gradient(135deg, #ffeb3b 0%, #ff9800 100%);
+  color: #5a3b1d;
+  text-align: center;
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  width: 100%;
+  max-width: 100%;
+  padding: 20px;
+  position: relative;
+}
+
+/* Fondo con efecto de luz */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.4) 0%, rgba(255, 193, 7, 0.2) 40%, transparent 70%);
+  animation: pulseLight 6s infinite alternate;
+}
+
+@keyframes pulseLight {
+  0% { opacity: 0.3; }
+  100% { opacity: 0.7; }
+}
+
+/* ESTILOS PARA LA PRIMERA PANTALLA (INTRO) */
+.intro {
+  background: rgba(255, 253, 231, 0.95);
+  border-radius: 25px;
+  padding: 40px 25px;
+  box-shadow: 
+    0 20px 40px rgba(139, 109, 42, 0.3),
+    0 0 0 10px rgba(255, 235, 59, 0.2),
+    0 0 0 15px rgba(255, 193, 7, 0.1);
+  position: relative;
+  overflow: hidden;
+  border: 2px solid #ffd54f;
+  max-width: 90%;
+  margin: 0 auto;
+  transform: translateY(0);
+  transition: transform 0.5s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.intro:hover {
+  transform: translateY(-5px);
+}
+
+.intro::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255, 235, 59, 0.1), transparent);
+  transform: rotate(45deg);
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  0% { transform: translateX(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) rotate(45deg); }
+}
+
+/* Título mejorado */
+.intro h1 {
+  font-size: 2.5rem;
+  margin-bottom: 25px;
+  color: #e65100;
+  text-shadow: 2px 2px 0px #ffeb3b;
+  font-weight: 700;
+  position: relative;
+  display: inline-block;
+  padding: 0 10px;
+}
+
+.intro h1::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 25%;
+  width: 50%;
+  height: 3px;
+  background: linear-gradient(to right, transparent, #ff9800, transparent);
+  border-radius: 2px;
+}
+
+/* Botón mejorado */
+.btn {
+  margin-top: 30px;
+  padding: 18px 45px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(145deg, #ff9800, #ff5722);
+  color: white;
+  cursor: pointer;
+  transition: all 0.4s;
+  box-shadow: 
+    0 8px 20px rgba(255, 87, 34, 0.4),
+    0 0 0 3px rgba(255, 193, 7, 0.3);
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(255, 255, 255, 0.2), transparent);
+  transform: translateY(-100%);
+  transition: transform 0.5s ease;
+}
+
+.btn:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 
+    0 12px 25px rgba(255, 87, 34, 0.6),
+    0 0 0 3px rgba(255, 235, 59, 0.5);
+}
+
+.btn:hover::before {
+  transform: translateY(0);
+}
+
+.btn:active {
+  transform: translateY(2px);
+}
+
+/* ESTILOS PARA LA SEGUNDA PANTALLA (CONTENT) */
+.content {
+  background: rgba(255, 253, 231, 0.95);
+  border-radius: 25px;
+  padding: 30px;
+  box-shadow: 0 15px 35px rgba(139, 109, 42, 0.15);
+  position: relative;
+  overflow: hidden;
+  border: 2px solid #ffd54f;
+  max-width: 90%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+}
+
+.content::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: linear-gradient(to right, #ffeb3b, #ff9800, #ffeb3b);
+  border-radius: 25px 25px 0 0;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.flower-field {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  margin: 20px 0;
+  perspective: 1000px;
+  max-height: 200px;
+  overflow: hidden;
+}
+
+.flower {
+  font-size: 3.5rem;
+  animation: growFlower 1.5s forwards;
+  transform: scale(0);
+  filter: drop-shadow(2px 4px 3px rgba(139, 109, 42, 0.3));
+  transition: transform 0.3s;
+}
+
+.flower:hover {
+  transform: scale(1.2) rotate(5deg);
+  z-index: 10;
+}
+
+@keyframes growFlower {
+  0% { transform: scale(0) rotate(-180deg); }
+  70% { transform: scale(1.1) rotate(10deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.message-container {
+  max-width: 550px;
+  padding: 20px;
+  margin: 15px auto;
+  border: 2px dashed #ffc107;
+  border-radius: 20px;
+  background: linear-gradient(to bottom, #fff9c4, #fffde7);
+  box-shadow: 0 10px 25px rgba(139, 109, 42, 0.15);
+  position: relative;
+}
+
+.message-container::before, .message-container::after {
+  content: "✿";
+  position: absolute;
+  color: #ffc107;
+  font-size: 1.5rem;
+}
+
+.message-container::before {
+  top: -10px;
+  left: 15px;
+  transform: rotate(-30deg);
+}
+
+.message-container::after {
+  bottom: -10px;
+  right: 15px;
+  transform: rotate(30deg);
+}
+
+#message {
+  font-size: 1.5rem;
+  line-height: 1.4;
+  color: #5a3b1d;
+  text-align: center;
+  font-weight: 600;
+}
+
+.petals-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.petal {
+  position: absolute;
+  width: 18px;
+  height: 25px;
+  background: linear-gradient(to bottom, #ffeb3b, #ffc107);
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  opacity: 0;
+  animation: fallDown 10s linear forwards;
+  filter: drop-shadow(1px 2px 1px rgba(139, 109, 42, 0.3));
+}
+
+@keyframes fallDown {
+  0% {
+    transform: translateY(-50px) rotate(-45deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(100vh) rotate(180deg);
+    opacity: 0;
+  }
+}
+
+.footer-note {
+  margin-top: 15px;
+  font-size: 1rem;
+  color: #ff9800;
+  font-weight: 600;
+}
+
+/* Elementos decorativos */
+.floating-hearts {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.floating-heart {
+  position: absolute;
+  font-size: 1.8rem;
+  opacity: 0;
+  animation: float 8s linear infinite;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+    opacity: 0.7;
+  }
+  80% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(-100px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Efecto de confeti */
+.confetti {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(45deg, #ffeb3b, #ff9800, #ff5722);
+  opacity: 0;
+  animation: confettiFall 5s linear infinite;
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(-100px) rotate(0deg);
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.sun {
+  position: fixed;
+  top: -50px;
+  right: -30px;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, #ffeb3b, #ffc107);
+  border-radius: 50%;
+  box-shadow: 0 0 40px rgba(255, 193, 7, 0.6);
+  z-index: 1;
+  animation: rotateSun 20s linear infinite;
+}
+
+@keyframes rotateSun {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+  .intro, .content {
+    padding: 30px 20px;
+    max-width: 95%;
+  }
+  
+  .intro h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  .btn {
+    padding: 16px 35px;
+    font-size: 1.1rem;
+  }
+  
+  .flower {
+    font-size: 3rem;
+  }
+  
+  #message {
+    font-size: 1.3rem;
+  }
+  
+  .sun {
+    width: 100px;
+    height: 100px;
+    top: -30px;
+    right: -30px;
+  }
+  
+  .flower-field {
+    gap: 10px;
+    max-height: 150px;
+  }
+  
+  .message-container {
+    padding: 15px;
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 480px) {
+  .intro h1 {
+    font-size: 1.8rem;
+  }
+  
+  .flower {
+    font-size: 2.5rem;
+  }
+  
+  #message {
+    font-size: 1.1rem;
+  }
+  
+  .message-container {
+    padding: 12px;
+  }
+  
+  .flower-field {
+    max-height: 120px;
+  }
+  
+  .btn {
+    padding: 14px 30px;
+    font-size: 1rem;
+  }
+}
