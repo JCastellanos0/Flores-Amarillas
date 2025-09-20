@@ -1,229 +1,442 @@
-// Variables globales
-let audioContext;
-let audioElement;
-let isPlaying = false;
-
-// Iniciar la experiencia
-document.getElementById("btn-start").addEventListener("click", () => {
-  const intro = document.getElementById("intro");
-  const content = document.getElementById("content");
-  
-  intro.classList.add("hidden");
-  content.classList.remove("hidden");
-  
-  // Reproducir la canción desde el segundo 47 hasta el minuto 3:33
-  playSongSegment(47, 3 * 60 + 33);
-  
-  startExperience();
-});
-
-// Función para reproducir segmento específico de la canción
-function playSongSegment(startSecond, endSecond) {
-  audioElement = document.getElementById("song");
-  
-  // Establecer el punto de inicio (47 segundos)
-  audioElement.currentTime = startSecond;
-  
-  // Reproducir la canción
-  audioElement.play();
-  isPlaying = true;
-  
-  // Detener la canción al llegar al tiempo especificado (3:33)
-  audioElement.ontimeupdate = function() {
-    if (audioElement.currentTime >= endSecond) {
-      audioElement.pause();
-      isPlaying = false;
-      audioElement.ontimeupdate = null; // Eliminar el event listener
-    }
-  };
-  
-  // Manejar errores de reproducción
-  audioElement.onerror = function() {
-    console.error("Error al cargar el audio. Asegúrate de que el archivo 'flores.mp3' existe.");
-    // Crear un tono de respaldo si la canción no está disponible
-    createFallbackAudio();
-  };
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-// Crear audio de respaldo si la canción no está disponible
-function createFallbackAudio() {
-  try {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
-    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    
-    oscillator.start();
-    setTimeout(() => oscillator.stop(), 106000); // Detener después de 106 segundos (3:33 - 0:47)
-    
-  } catch (e) {
-    console.error("El audio no está soportado en este navegador:", e);
+body {
+  font-family: 'Quicksand', sans-serif;
+  background: linear-gradient(135deg, #ffeb3b 0%, #ff9800 100%);
+  color: #5a3b1d;
+  text-align: center;
+  min-height: 100vh;
+  /* Ajustado: permitir scroll vertical en móviles */
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  width: 100%;
+  max-width: 100%;
+  padding: 20px;
+  position: relative;
+}
+
+/* Fondo con efecto de luz */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.4) 0%, rgba(255, 193, 7, 0.2) 40%, transparent 70%);
+  animation: pulseLight 6s infinite alternate;
+}
+
+@keyframes pulseLight {
+  0% { opacity: 0.3; }
+  100% { opacity: 0.7; }
+}
+
+/* ESTILOS PARA LA PRIMERA PANTALLA (INTRO) */
+.intro {
+  background: rgba(255, 253, 231, 0.95);
+  border-radius: 25px;
+  padding: 40px 25px;
+  box-shadow: 
+    0 20px 40px rgba(139, 109, 42, 0.3),
+    0 0 0 10px rgba(255, 235, 59, 0.2),
+    0 0 0 15px rgba(255, 193, 7, 0.1);
+  position: relative;
+  overflow: hidden;
+  border: 2px solid #ffd54f;
+  max-width: 90%;
+  margin: 0 auto;
+  transform: translateY(0);
+  transition: transform 0.5s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.intro:hover {
+  transform: translateY(-5px);
+}
+
+.intro::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255, 235, 59, 0.1), transparent);
+  transform: rotate(45deg);
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  0% { transform: translateX(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) rotate(45deg); }
+}
+
+/* Título mejorado */
+.intro h1 {
+  font-size: 2.5rem;
+  margin-bottom: 25px;
+  color: #e65100;
+  text-shadow: 2px 2px 0px #ffeb3b;
+  font-weight: 700;
+  position: relative;
+  display: inline-block;
+  padding: 0 10px;
+}
+
+.intro h1::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 25%;
+  width: 50%;
+  height: 3px;
+  background: linear-gradient(to right, transparent, #ff9800, transparent);
+  border-radius: 2px;
+}
+
+/* Botón mejorado */
+.btn {
+  margin-top: 30px;
+  padding: 18px 45px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(145deg, #ff9800, #ff5722);
+  color: white;
+  cursor: pointer;
+  transition: all 0.4s;
+  box-shadow: 
+    0 8px 20px rgba(255, 87, 34, 0.4),
+    0 0 0 3px rgba(255, 193, 7, 0.3);
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(255, 255, 255, 0.2), transparent);
+  transform: translateY(-100%);
+  transition: transform 0.5s ease;
+}
+
+.btn:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 
+    0 12px 25px rgba(255, 87, 34, 0.6),
+    0 0 0 3px rgba(255, 235, 59, 0.5);
+}
+
+.btn:hover::before {
+  transform: translateY(0);
+}
+
+.btn:active {
+  transform: translateY(2px);
+}
+
+/* ESTILOS PARA LA SEGUNDA PANTALLA (CONTENT) */
+.content {
+  background: rgba(255, 253, 231, 0.95);
+  border-radius: 25px;
+  padding: 30px;
+  box-shadow: 0 15px 35px rgba(139, 109, 42, 0.15);
+  position: relative;
+  overflow: visible; /* Ajustado */
+  border: 2px solid #ffd54f;
+  max-width: 90%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: auto; /* Ajustado */
+}
+
+.content::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: linear-gradient(to right, #ffeb3b, #ff9800, #ffeb3b);
+  border-radius: 25px 25px 0 0;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.flower-field {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  margin: 20px 0;
+  perspective: 1000px;
+  max-height: none; /* Ajustado */
+  overflow: visible; /* Ajustado */
+}
+
+.flower {
+  font-size: 3.5rem;
+  animation: growFlower 1.5s forwards;
+  transform: scale(0);
+  filter: drop-shadow(2px 4px 3px rgba(139, 109, 42, 0.3));
+  transition: transform 0.3s;
+}
+
+.flower:hover {
+  transform: scale(1.2) rotate(5deg);
+  z-index: 10;
+}
+
+@keyframes growFlower {
+  0% { transform: scale(0) rotate(-180deg); }
+  70% { transform: scale(1.1) rotate(10deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.message-container {
+  max-width: 550px;
+  padding: 20px;
+  margin: 15px auto;
+  border: 2px dashed #ffc107;
+  border-radius: 20px;
+  background: linear-gradient(to bottom, #fff9c4, #fffde7);
+  box-shadow: 0 10px 25px rgba(139, 109, 42, 0.15);
+  position: relative;
+}
+
+.message-container::before, .message-container::after {
+  content: "✿";
+  position: absolute;
+  color: #ffc107;
+  font-size: 1.5rem;
+}
+
+.message-container::before {
+  top: -10px;
+  left: 15px;
+  transform: rotate(-30deg);
+}
+
+.message-container::after {
+  bottom: -10px;
+  right: 15px;
+  transform: rotate(30deg);
+}
+
+#message {
+  font-size: 1.5rem;
+  line-height: 1.4;
+  color: #5a3b1d;
+  text-align: center;
+  font-weight: 600;
+}
+
+.petals-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.petal {
+  position: absolute;
+  width: 18px;
+  height: 25px;
+  background: linear-gradient(to bottom, #ffeb3b, #ffc107);
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  opacity: 0;
+  animation: fallDown 10s linear forwards;
+  filter: drop-shadow(1px 2px 1px rgba(139, 109, 42, 0.3));
+}
+
+@keyframes fallDown {
+  0% {
+    transform: translateY(-50px) rotate(-45deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(100vh) rotate(180deg);
+    opacity: 0;
   }
 }
 
-// Crear pétalos cayendo
-function crearPetales() {
-  const petalsContainer = document.getElementById("petals");
-  
-  for (let i = 0; i < 20; i++) {
-    setTimeout(() => {
-      const petal = document.createElement("div");
-      petal.classList.add("petal");
-      
-      // Posición aleatoria
-      petal.style.left = Math.random() * window.innerWidth + "px";
-      
-      // Tamaño aleatorio
-      const size = Math.random() * 12 + 8;
-      petal.style.width = `${size}px`;
-      petal.style.height = `${size * 1.5}px`;
-      
-      // Duración aleatoria de animación
-      petal.style.animationDuration = (Math.random() * 5 + 5) + "s";
-      
-      // Opacidad aleatoria
-      petal.style.opacity = Math.random() * 0.5 + 0.3;
-      
-      petalsContainer.appendChild(petal);
-      
-      // Eliminar después de la animación
-      setTimeout(() => {
-        if (petal.parentNode) {
-          petal.parentNode.removeChild(petal);
-        }
-      }, 10000);
-    }, i * 300);
+.footer-note {
+  margin-top: 15px;
+  font-size: 1rem;
+  color: #ff9800;
+  font-weight: 600;
+}
+
+/* Elementos decorativos */
+.floating-hearts {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.floating-heart {
+  position: absolute;
+  font-size: 1.8rem;
+  opacity: 0;
+  animation: float 8s linear infinite;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+    opacity: 0.7;
+  }
+  80% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(-100px) rotate(360deg);
+    opacity: 0;
   }
 }
 
-// Mostrar flores con animación (menos flores para que quepa en pantalla)
-function mostrarFlores() {
-  const flowersContainer = document.getElementById("flowers");
-  const flowerCount = 6; // Reducido a 6 flores para que quepa en pantalla
-  
-  for (let i = 0; i < flowerCount; i++) {
-    const flower = document.createElement("div");
-    flower.classList.add("flower");
-    flower.textContent = "🌻";
-    flower.style.animationDelay = `${i * 0.2}s`;
-    flowersContainer.appendChild(flower);
+/* Efecto de confeti */
+.confetti {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(45deg, #ffeb3b, #ff9800, #ff5722);
+  opacity: 0;
+  animation: confettiFall 5s linear infinite;
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(-100px) rotate(0deg);
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
   }
 }
 
-// Mostrar mensaje con efecto de escritura (más corto)
-function mostrarMensaje() {
-  const mensajes = [
-    "Feliz 21 de septiembre 💛",
-    "Te regalo estas flores amarillas",
-    "porque iluminas mi vida como el sol",
-    "Eres especial y única,",
-    "y te aprecio más de lo que las palabras pueden expresar.",
-    "Con cariño..."
-  ];
-  
-  const p = document.getElementById("message");
-  let messageIndex = 0;
-  let charIndex = 0;
-  
-  function typeWriter() {
-    if (messageIndex < mensajes.length) {
-      if (charIndex < mensajes[messageIndex].length) {
-        p.innerHTML += mensajes[messageIndex].charAt(charIndex);
-        charIndex++;
-        setTimeout(typeWriter, 70);
-      } else {
-        p.innerHTML += "<br>";
-        messageIndex++;
-        charIndex = 0;
-        setTimeout(typeWriter, 400);
-      }
-    }
+.sun {
+  position: fixed;
+  top: -50px;
+  right: -30px;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, #ffeb3b, #ffc107);
+  border-radius: 50%;
+  box-shadow: 0 0 40px rgba(255, 193, 7, 0.6);
+  z-index: 1;
+  animation: rotateSun 20s linear infinite;
+}
+
+@keyframes rotateSun {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+  .intro, .content {
+    padding: 30px 20px;
+    max-width: 95%;
   }
   
-  typeWriter();
-}
-
-// Iniciar toda la experiencia
-function startExperience() {
-  // Crear pétalos
-  crearPetales();
-  
-  // Mostrar flores
-  mostrarFlores();
-  
-  // Mostrar mensaje después de un breve delay
-  setTimeout(mostrarMensaje, 1500);
-  
-  // Continuar creando pétalos periódicamente
-  setInterval(crearPetales, 8000);
-}
-
-// Pausar la canción si el usuario cambia de pestaña
-document.addEventListener('visibilitychange', function() {
-  if (audioElement && isPlaying) {
-    if (document.hidden) {
-      audioElement.pause();
-    } else {
-      audioElement.play();
-    }
+  .intro h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
   }
-});
-
-// Crear elementos decorativos para la primera pantalla
-function createIntroEffects() {
-  createFloatingHearts();
-  createConfetti();
-}
-
-// Crear corazones flotantes
-function createFloatingHearts() {
-  const heartsContainer = document.createElement('div');
-  heartsContainer.classList.add('floating-hearts');
-  document.querySelector('.container').appendChild(heartsContainer);
   
-  for (let i = 0; i < 12; i++) {
-    setTimeout(() => {
-      const heart = document.createElement('div');
-      heart.classList.add('floating-heart');
-      heart.innerHTML = '💛';
-      heart.style.left = `${Math.random() * 100}%`;
-      heart.style.animationDelay = `${i * 0.8}s`;
-      heartsContainer.appendChild(heart);
-    }, i * 800);
+  .btn {
+    padding: 16px 35px;
+    font-size: 1.1rem;
+  }
+  
+  .flower {
+    font-size: 3rem;
+  }
+  
+  #message {
+    font-size: 1.3rem;
+  }
+  
+  .sun {
+    width: 100px;
+    height: 100px;
+    top: -30px;
+    right: -30px;
+  }
+  
+  .flower-field {
+    gap: 10px;
+    max-height: none; /* Ajustado */
+  }
+  
+  .message-container {
+    padding: 15px;
+    max-width: 90%;
   }
 }
 
-// Crear efecto de confeti
-function createConfetti() {
-  const introElement = document.querySelector('.intro');
+@media (max-width: 480px) {
+  .intro h1 {
+    font-size: 1.8rem;
+  }
   
-  for (let i = 0; i < 30; i++) {
-    const confetti = document.createElement('div');
-    confetti.classList.add('confetti');
-    confetti.style.left = `${Math.random() * 100}%`;
-    confetti.style.animationDelay = `${Math.random() * 5}s`;
-    confetti.style.animationDuration = `${3 + Math.random() * 3}s`;
-    
-    // Colores aleatorios
-    const colors = [
-      'linear-gradient(45deg, #ffeb3b, #ffc107)',
-      'linear-gradient(45deg, #ff9800, #ff5722)',
-      'linear-gradient(45deg, #4caf50, #8bc34a)',
-      'linear-gradient(45deg, #2196f3, #03a9f4)'
-    ];
-    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
-    
-    introElement.appendChild(confetti);
+  .flower {
+    font-size: 2.5rem;
+  }
+  
+  #message {
+    font-size: 1.1rem;
+  }
+  
+  .message-container {
+    padding: 12px;
+  }
+  
+  .flower-field {
+    max-height: none; /* Ajustado */
+  }
+  
+  .btn {
+    padding: 14px 30px;
+    font-size: 1rem;
   }
 }
-
-// Inicializar efectos cuando la página cargue
-window.addEventListener('DOMContentLoaded', () => {
-  createIntroEffects();
-});
